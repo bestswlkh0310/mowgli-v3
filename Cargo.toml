@@ -1,0 +1,18 @@
+[package]
+name = "mowgli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dotenv = "0.15.0"
+rand = { version = "0.9.0-alpha.2", features = [] }
+chrono = "0.4.38"
+serde = { version = "1.0.204", features = ["derive"] }
+
+[dependencies.tokio]
+version = "1.39.2"
+features = ["macros", "rt-multi-thread"]
+
+[dependencies.serenity]
+version = "0.12.2"
+features = ["cache", "framework", "standard_framework"]
