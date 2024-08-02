@@ -5,10 +5,10 @@ use crate::commands::CommandTrait;
 use crate::database::team_repo::TeamRepo;
 use crate::global::discord::Discord;
 
-pub struct CreateTodoCommand;
+pub struct AskTeamCommand;
 
 #[async_trait]
-impl CommandTrait for CreateTodoCommand {
+impl CommandTrait for AskTeamCommand {
     async fn run(discord: &Discord, command: &CommandInteraction) -> Result<Option<CreateEmbed>> {
         let teams = TeamRepo::new(discord).get_teams().await?;
         let buttons = teams.iter()

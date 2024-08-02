@@ -13,8 +13,8 @@ use serenity::{
 };
 use serenity::all::{CommandInteraction, CommandOptionType, ComponentInteraction, CreateCommand, CreateCommandOption};
 use crate::commands::CommandTrait;
-use crate::commands::create_todo_command::CreateTodoCommand;
-use crate::commands::get_todos_command::GetTodosCommand;
+use crate::commands::create_todo_command::AskTeamCommand;
+
 use crate::commands::not_found_command::NotFoundCommand;
 use crate::commands::reset_todos_command::ResetTodosCommand;
 use crate::component::ComponentTrait;
@@ -66,9 +66,9 @@ impl Handler {
         let data = &command.data;
         let result = match data.name.as_str() {
             "todo" => match data.options.first().unwrap().name.as_str() {
-                "show" => GetTodosCommand::run(&discord, command).await,
+                "show" => AskTeamCommand::run(&discord, command).await,
                 "reset" => ResetTodosCommand::run(&discord, command).await,
-                "add" => CreateTodoCommand::run(&discord, command).await,
+                "add" => AskTeamCommand::run(&discord, command).await,
                 _ => NotFoundCommand::run(&discord, command).await
             },
             _ => NotFoundCommand::run(&discord, command).await
@@ -144,7 +144,7 @@ impl EventHandler for Handler {
             CreateCommand::new("todo")
                 .description("투두~")
                 .add_option(
-                    CreateCommandOption::new(CommandOptionType::SubCommand, "add", "투두을 추가합니다.")
+                    CreateCommandOption::new(CommandOptionType::SubCommand, "add", "투두 추가")
                 )
                 .add_option(
                     CreateCommandOption::new(CommandOptionType::SubCommand, "reset", "투두 초기화")

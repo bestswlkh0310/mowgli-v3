@@ -11,7 +11,7 @@ impl CommandTrait for NotFoundCommand {
         let create_embed = CreateEmbed::new()
             .title("404")
             .description("우와.. 어떻게 이 명령어를 입력했나요?")
-            .color(Colour::new(0xF90707));
+            .color(Colour::new(0x33F646));
         Ok(Some(create_embed))
     }
 }

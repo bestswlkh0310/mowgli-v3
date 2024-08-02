@@ -20,7 +20,7 @@ impl<'a> TodoRepo<'a> {
 
     pub async fn get_todos_by_team(&self, team_name: &String) -> Result<Vec<Todo>> {
         let todos = self.get_todos().await?;
-        let todos = todos.iter().filter(|todo| todo.team.name == team_name.to_lowercase()).cloned().collect();
+        let todos = todos.iter().filter(|todo| todo.team.name == team_name.clone()).cloned().collect();
         Ok(todos)
     }
 

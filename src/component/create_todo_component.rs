@@ -18,7 +18,7 @@ pub struct CreateTodoComponent;
 #[async_trait]
 impl ComponentTrait for CreateTodoComponent {
     async fn run(discord: &Discord, component: &ComponentInteraction) -> serenity::Result<Option<CreateEmbed>> {
-        let team_name = &component.data.custom_id.to_lowercase();
+        let team_name = &component.data.custom_id;
         let modal = CreateQuickModal::new("todo 추가")
             .field(
                 CreateInputText::new(InputTextStyle::Short, "투두", "content")
