@@ -1,7 +1,8 @@
-use serenity::all::{Colour, ComponentInteraction, CreateEmbed};
+use serenity::all::{ComponentInteraction, CreateEmbed};
 use serenity::async_trait;
 use crate::component::ComponentTrait;
 use crate::global::discord::Discord;
+use crate::util::colour::RED;
 
 pub struct NotFountComponent;
 
@@ -11,7 +12,7 @@ impl ComponentTrait for NotFountComponent {
         let create_embed: CreateEmbed = CreateEmbed::new()
             .title("404")
             .description("우와.. 어떻게 이 명령어를 입력했나요?")
-            .color(Colour::new(0xF90707));
+            .color(RED);
         Ok(Some(create_embed))
     }
 }

@@ -1,7 +1,8 @@
-use serenity::all::{Colour, CommandInteraction, CreateEmbed};
+use serenity::all::{CommandInteraction, CreateEmbed};
 use serenity::async_trait;
 use crate::commands::CommandTrait;
 use crate::global::discord::Discord;
+use crate::util::colour::RED;
 
 pub struct NotFoundCommand;
 
@@ -11,7 +12,7 @@ impl CommandTrait for NotFoundCommand {
         let create_embed = CreateEmbed::new()
             .title("404")
             .description("우와.. 어떻게 이 명령어를 입력했나요?")
-            .color(Colour::new(0x33F646));
+            .color(RED);
         Ok(Some(create_embed))
     }
 }

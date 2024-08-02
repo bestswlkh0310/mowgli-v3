@@ -5,7 +5,7 @@ use crate::global::discord::Discord;
 
 pub mod create_todo_component;
 pub mod not_found;
-pub mod get_todos_component;
+pub mod show_todos_component;
 
 #[async_trait]
 pub trait ComponentTrait {

@@ -6,6 +6,7 @@ use crate::global::discord::Discord;
 pub mod reset_todos_command;
 pub mod create_todo_command;
 pub mod not_found_command;
+pub mod show_all_todos_command;
 
 #[async_trait]
 pub trait CommandTrait {

@@ -17,9 +17,10 @@ use crate::commands::create_todo_command::AskTeamCommand;
 
 use crate::commands::not_found_command::NotFoundCommand;
 use crate::commands::reset_todos_command::ResetTodosCommand;
+use crate::commands::show_all_todos_command::ShowAllTodosCommand;
 use crate::component::ComponentTrait;
 use crate::component::create_todo_component::CreateTodoComponent;
-use crate::component::get_todos_component::GetTodosComponent;
+use crate::component::show_todos_component::ShowTodosComponent;
 use crate::component::not_found::NotFountComponent;
 use crate::config::config::Config;
 use crate::global::discord::Discord;
@@ -67,6 +68,7 @@ impl Handler {
         let result = match data.name.as_str() {
             "todo" => match data.options.first().unwrap().name.as_str() {
                 "show" => AskTeamCommand::run(&discord, command).await,
+                "show-all" => ShowAllTodosCommand::run(&discord, command).await,
                 "reset" => ResetTodosCommand::run(&discord, command).await,
                 "add" => AskTeamCommand::run(&discord, command).await,
                 _ => NotFoundCommand::run(&discord, command).await
@@ -104,7 +106,7 @@ impl Handler {
         let interaction_name = message_interaction.name.as_str();
         let result = match interaction_name {
             "todo add" => CreateTodoComponent::run(&discord, component).await,
-            "todo show" => GetTodosComponent::run(&discord, component).await,
+            "todo show" => ShowTodosComponent::run(&discord, component).await,
             _ => NotFountComponent::run(&discord, component).await
         };
 
@@ -151,6 +153,9 @@ impl EventHandler for Handler {
                 )
                 .add_option(
                     CreateCommandOption::new(CommandOptionType::SubCommand, "show", "투두 확인")
+                )
+                .add_option(
+                    CreateCommandOption::new(CommandOptionType::SubCommand, "show-all", "전체 투두 확인")
                 )
         ])
             .await
