@@ -1,4 +1,3 @@
 pub mod database;
-pub mod team;
-pub mod todo;
-pub mod database_mock;
+pub mod team_repo;
+pub mod todo_repo;
