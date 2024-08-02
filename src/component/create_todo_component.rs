@@ -19,7 +19,7 @@ pub struct CreateTodoComponent;
 impl ComponentTrait for CreateTodoComponent {
     async fn run(discord: &Discord, component: &ComponentInteraction) -> serenity::Result<Option<CreateEmbed>> {
         let team_name = &component.data.custom_id.to_lowercase();
-        let modal = CreateQuickModal::new("투두추가")
+        let modal = CreateQuickModal::new("todo 추가")
             .field(
                 CreateInputText::new(InputTextStyle::Short, "투두", "content")
                     .placeholder("Auth 기능 구현")
@@ -68,7 +68,7 @@ impl ComponentTrait for CreateTodoComponent {
 
         let create_embed = CreateEmbed::new()
             .title("투두추가 성공")
-            .description(format!("{}까지 {}. 화이팅!", deadline, content));
+            .description(format!("{}까지 {} 화이팅!", deadline, content));
 
         let builder = create_response(create_embed);
         if let Err(why) = response.interaction.create_response(&discord.ctx.http, builder).await {

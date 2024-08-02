@@ -19,6 +19,7 @@ use crate::commands::not_found_command::NotFoundCommand;
 use crate::commands::reset_todos_command::ResetTodosCommand;
 use crate::component::ComponentTrait;
 use crate::component::create_todo_component::CreateTodoComponent;
+use crate::component::get_todos_component::GetTodosComponent;
 use crate::component::not_found::NotFountComponent;
 use crate::config::config::Config;
 use crate::global::discord::Discord;
@@ -42,7 +43,13 @@ static ARR: &[&str] = &[
     "병신",
     "ㅂㅅ",
     "장애",
-    "새끼"
+    "새끼",
+    "어쩌라고",
+    "어쩔",
+    "저쩔",
+    "html은 프로그래밍 언어",
+    "java는 프로그래밍 언어",
+    "objective-c는 프로그래밍 언어"
 ];
 
 // impl for interaction_create fn
@@ -96,7 +103,8 @@ impl Handler {
         // handle message interaction
         let interaction_name = message_interaction.name.as_str();
         let result = match interaction_name {
-            "투두추가" => CreateTodoComponent::run(&discord, component).await,
+            "todo add" => CreateTodoComponent::run(&discord, component).await,
+            "todo show" => GetTodosComponent::run(&discord, component).await,
             _ => NotFountComponent::run(&discord, component).await
         };
 
@@ -134,7 +142,7 @@ impl EventHandler for Handler {
         // register command
         Command::set_global_commands(&ctx.http, vec![
             CreateCommand::new("todo")
-                .description("투두")
+                .description("투두~")
                 .add_option(
                     CreateCommandOption::new(CommandOptionType::SubCommand, "add", "투두을 추가합니다.")
                 )
@@ -143,10 +151,6 @@ impl EventHandler for Handler {
                 )
                 .add_option(
                     CreateCommandOption::new(CommandOptionType::SubCommand, "show", "투두 확인")
-                        .add_sub_option(
-                            CreateCommandOption::new(CommandOptionType::String, "팀", "Android / iOS / Server / Web")
-                                .required(true),
-                        )
                 )
         ])
             .await
@@ -154,7 +158,6 @@ impl EventHandler for Handler {
     }
 
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-        println!("WOWOWOWOOWOWOW");
         match interaction {
             Interaction::Command(command) => self.handle_command_interaction(&ctx, &command).await,
             Interaction::Component(component) => self.handle_component_interaction(&ctx, &component).await,
