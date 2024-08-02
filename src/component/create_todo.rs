@@ -58,7 +58,7 @@ impl ComponentTrait for CreateTodoComponent {
         println!("{}, {}", m, d);
 
         let entity = Database.get_entity(&ctx.http, &guild_id).await?;
-        let todo_repo = TodoRepo::new(&entity);
+        let mut todo_repo = TodoRepo::new(entity.clone());
         let todo = Todo {
             team: Team { name: team_name.clone() },
             todo: TodoContent {
@@ -67,6 +67,7 @@ impl ComponentTrait for CreateTodoComponent {
             },
         };
         todo_repo.create_todo(todo)?;
+        Database.edit_entity(&ctx.http, &guild_id, &todo_repo.entity).await?;
 
         let create_embed = CreateEmbed::new()
             .title("할일추가 성공")

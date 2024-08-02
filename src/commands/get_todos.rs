@@ -42,7 +42,7 @@ impl CommandTrait for GetTodosCommand {
         };
 
         let todos = {
-            let todo_repo = TodoRepo::new(&entity);
+            let todo_repo = TodoRepo::new(entity);
             todo_repo.get_todos_by_team(team_name.to_string())
         }?;
         let message = to_string(&todos)?;

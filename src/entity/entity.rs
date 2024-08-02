@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use crate::entity::team::Team;
 use crate::entity::todo::Todo;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct Entity {
     pub teams: Vec<Team>,
     pub todos: Vec<Todo>,

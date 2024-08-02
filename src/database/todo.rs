@@ -3,12 +3,12 @@ use crate::entity::todo::Todo;
 use serenity::Result;
 use crate::database::database::{Database, DatabaseTrait};
 
-pub struct TodoRepo<'a> {
-    entity: &'a Entity,
+pub struct TodoRepo {
+    pub entity: Entity,
 }
 
-impl<'a> TodoRepo<'a> {
-    pub fn new(entity: &'a Entity) -> Self {
+impl TodoRepo {
+    pub fn new(entity: Entity) -> Self {
         TodoRepo { entity }
     }
 
@@ -23,9 +23,8 @@ impl<'a> TodoRepo<'a> {
         Ok(todos)
     }
 
-    pub fn create_todo(&self, todo: Todo) -> Result<()> {
-        let mut todos = self.get_todos()?;
-        todos.push(todo);
+    pub fn create_todo(&mut self, todo: Todo) -> Result<()> {
+        self.entity.todos.push(todo);
         Ok(())
     }
 }
