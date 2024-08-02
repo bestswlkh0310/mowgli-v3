@@ -1,5 +1,5 @@
 use serenity::{async_trait, Result};
-use serenity::all::{ButtonStyle, CommandInteraction, CreateActionRow, CreateButton, CreateCommand, CreateEmbed, CreateInteractionResponse, CreateInteractionResponseMessage};
+use serenity::all::{ButtonStyle, CommandInteraction, CreateActionRow, CreateButton, CreateEmbed, CreateInteractionResponse, CreateInteractionResponseMessage};
 
 use crate::commands::CommandTrait;
 use crate::database::team_repo::TeamRepo;
@@ -9,11 +9,6 @@ pub struct CreateTodoCommand;
 
 #[async_trait]
 impl CommandTrait for CreateTodoCommand {
-    async fn register() -> CreateCommand {
-        CreateCommand::new("할일추가")
-            .description("할일을 추가합니다.")
-    }
-
     async fn run(discord: &Discord, command: &CommandInteraction) -> Result<Option<CreateEmbed>> {
         let teams = TeamRepo::new(discord).get_teams().await?;
         let buttons = teams.iter()

@@ -19,9 +19,9 @@ pub struct CreateTodoComponent;
 impl ComponentTrait for CreateTodoComponent {
     async fn run(discord: &Discord, component: &ComponentInteraction) -> serenity::Result<Option<CreateEmbed>> {
         let team_name = &component.data.custom_id.to_lowercase();
-        let modal = CreateQuickModal::new("할일추가")
+        let modal = CreateQuickModal::new("투두추가")
             .field(
-                CreateInputText::new(InputTextStyle::Short, "할일", "content")
+                CreateInputText::new(InputTextStyle::Short, "투두", "content")
                     .placeholder("Auth 기능 구현")
                     .min_length(1)
                     .max_length(300)
@@ -67,7 +67,7 @@ impl ComponentTrait for CreateTodoComponent {
         todo_repo.create_todo(&todo).await?;
 
         let create_embed = CreateEmbed::new()
-            .title("할일추가 성공")
+            .title("투두추가 성공")
             .description(format!("{}까지 {}. 화이팅!", deadline, content));
 
         let builder = create_response(create_embed);

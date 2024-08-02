@@ -1,4 +1,4 @@
-use serenity::all::{Colour, CommandInteraction, CreateCommand, CreateEmbed};
+use serenity::all::{Colour, CommandInteraction, CreateEmbed};
 use serenity::async_trait;
 use crate::commands::CommandTrait;
 use crate::global::discord::Discord;
@@ -7,10 +7,6 @@ pub struct NotFoundCommand;
 
 #[async_trait]
 impl CommandTrait for NotFoundCommand {
-    async fn register() -> CreateCommand {
-        CreateCommand::new("")
-    }
-
     async fn run(_discord: &Discord, _command: &CommandInteraction) -> serenity::Result<Option<CreateEmbed>> {
         let create_embed = CreateEmbed::new()
             .title("404")
