@@ -24,7 +24,6 @@ impl UnknownCreateEmbed for CreateEmbed {
     }
 }
 
-
 fn make_create_embed(description: String) -> CreateEmbed {
     CreateEmbed::new()
         .title("Error 😅")

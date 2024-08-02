@@ -1,148 +1,94 @@
-use std::env;
-use std::io::Error;
-use std::time::{SystemTime, UNIX_EPOCH};
-
-use dotenv::dotenv;
-use serenity::{
-    all::Message,
-    async_trait,
-    builder::{CreateInteractionResponse, CreateInteractionResponseMessage},
-    gateway::ActivityData,
-    model::{
-        application::{Command, Interaction},
-        gateway::Ready,
-    },
-    prelude::*,
-    utils::MessageBuilder,
-};
-use serenity::all::{CommandInteraction, ComponentInteraction, CreateEmbed, Integration};
-use serenity::all::Opcode::Heartbeat;
-use crate::commands::CommandTrait;
-use crate::commands::create_todo::CreateTodoCommand;
-use crate::commands::get_todos::GetTodosCommand;
-use crate::commands::not_found::NotFoundCommand;
-use crate::commands::reset_todos::ResetTodosCommand;
+use std::str::FromStr;
+use chrono::NaiveDate;
+use serenity::all::{ComponentInteraction, Context, CreateInputText, CreateInteractionResponse, CreateInteractionResponseMessage, CreateQuickModal, InputTextStyle};
+use serenity::{async_trait, Error};
+use serenity::builder::CreateEmbed;
 use crate::component::ComponentTrait;
-use crate::component::create_todo::CreateTodoComponent;
-use crate::component::not_found::NotFountComponent;
-use crate::config::config::Config;
-use crate::util::error::{ResultCreateEmbed, UnknownCreateEmbed};
+use crate::database::database::{Database, DatabaseTrait};
+use crate::database::todo::TodoRepo;
+use crate::entity::team::Team;
+use crate::entity::todo::{Todo, TodoContent};
 
-mod commands;
-mod service;
-mod database;
-mod util;
-mod entity;
-mod config;
-mod component;
-
-struct Handler;
-
-static ARR: &[&str] = &[
-    "ㅅㅂ",
-    "시발",
-    "병신",
-    "ㅂㅅ",
-    "장애",
-    "새끼"
-];
+pub struct CreateTodoComponent;
 
 #[async_trait]
-impl EventHandler for Handler {
-    async fn message(&self, ctx: Context, msg: Message) {
-        let content = msg.content;
-        if ARR.iter().any(|&i| content.contains(i)) {
-            let response = MessageBuilder::new()
-                .push(format!("{}님 ", msg.author.mention()))
-                .push_bold_safe("올바른 언어 습관")
-                .push("을 들입시다")
-                .build();
-            _ = msg.channel_id.say(&ctx.http, &response).await;
-        }
-    }
+impl ComponentTrait for CreateTodoComponent {
+    async fn run(ctx: &Context, component: &ComponentInteraction) -> serenity::Result<()> {
+        let guild_id = component.guild_id
+            .ok_or_else(|| Error::Other("guild id가 없습니다"))?;
+        let team_name = &component.data.custom_id.to_lowercase();
+        let modal = CreateQuickModal::new("할일추가")
+            .field(
+                CreateInputText::new(InputTextStyle::Short, "할일", "content")
+                    .placeholder("Auth 기능 구현")
+                    .min_length(1)
+                    .max_length(300)
+            )
+            .field(
+                CreateInputText::new(InputTextStyle::Short, "마감기한", "deadline")
+                    .placeholder("ex. 3월 2일 -> 3/2")
+                    .min_length(3)
+                    .max_length(5)
+            );
 
-    async fn ready(&self, ctx: Context, ready: Ready) {
-        println!("{} 봇 실행 완료!", ready.user.name);
-        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-        ctx.set_activity(Some(ActivityData::playing(format!("{}", now))));
-        Command::set_global_commands(&ctx.http, vec![
-            GetTodosCommand::register().await,
-            ResetTodosCommand::register().await,
-            CreateTodoCommand::register().await,
-        ])
-            .await
-            .expect("명령 생성에 실패했습니다.");
-    }
-
-    async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-        match interaction {
-            Interaction::Command(command) => self.handle_command_interaction(&ctx, &command).await,
-            Interaction::Component(component) => self.handle_component_interaction(&ctx, &component).await,
-                _ => {}
+        let response = match component.quick_modal(ctx, modal).await {
+            Ok(Some(res)) => res,
+            Err(why) => return Err(why),
+            _ => return Err(Error::Other("response is None"))
         };
+        let inputs = &response.inputs;
+        let (content, deadline) = (&inputs[0], &inputs[1]);
+        let d: Vec<&str> = deadline.split("/").collect();
+        println!("{:?}", d);
+        if d.iter().count() != 2 {
+            let create_embed = CreateEmbed::new()
+                .title("마감일을 제대로 입력해주세요")
+                .description("ex. 3월 2일 -> 3/2");
+
+            let data = CreateInteractionResponseMessage::new()
+                .add_embed(create_embed);
+            let builder = CreateInteractionResponse::Message(data);
+            response.interaction.create_response(&ctx.http, builder).await?;
+            return Err(Error::Other("잘못된 deadline"));
+        }
+
+        let m = u32::from_str(d[0]).map_err(|_| Error::Other("month 파싱 실패"))?;
+        let d = u32::from_str(d[1]).map_err(|_| Error::Other("day 파싱 실패"))?;
+
+        println!("{}, {}", m, d);
+
+        let entity = Database.get_entity(&ctx.http, &guild_id).await?;
+        let todo_repo = TodoRepo::new(&entity);
+        let todo = Todo {
+            team: Team { name: team_name.clone() },
+            todo: TodoContent {
+                content: content.clone(),
+                deadline: NaiveDate::from_ymd_opt(2024, m, d).ok_or_else(|| Error::Other("NaiveDate 파싱 실패"))?,
+            },
+        };
+        todo_repo.create_todo(todo)?;
+
+        let create_embed = CreateEmbed::new()
+            .title("할일추가 성공")
+            .description(format!("{}까지 {}. 화이팅!", deadline, content));
+
+        let data = CreateInteractionResponseMessage::new()
+            .add_embed(create_embed);
+        let builder = CreateInteractionResponse::Message(data);
+        response.interaction.create_response(&ctx.http, builder).await?;
+        Ok(())
     }
 }
-
-impl Handler {
-    async fn handle_command_interaction(&self, ctx: &Context, command: &CommandInteraction) {
-        let command_name = command.data.name.as_str();
-        let result = match command_name {
-            "할일" => GetTodosCommand::run(ctx, command).await,
-            "할일초기화" => ResetTodosCommand::run(ctx, command).await,
-            "할일추가" => CreateTodoCommand::run(ctx, command).await,
-            _ => NotFoundCommand::run(ctx, command).await
-        };
-        if let Err(why) = result {
-            println!("API 에러 발생 - {}", why);
-        }
-    }
-
-    async fn handle_component_interaction(&self, ctx: &Context, component: &ComponentInteraction) {
-        // println!("{:#?}", component);
-        let message_interaction = match &component.message.interaction {
-            Some(v) => v,
-            _ => return
-        };
-        let interaction_name = message_interaction.name.as_str();
-        let result = match interaction_name {
-            "할일추가" => CreateTodoComponent::run(ctx, component).await,
-            _ => NotFountComponent::run(ctx, component).await
-        };
-        if let Err(why) = result {
-            println!("API 에러 발생 - {}", why);
-        }
-    }
-}
-
-
-#[tokio::main]
-async fn main() {
-    let intents = GatewayIntents::GUILD_MESSAGES
-        | GatewayIntents::MESSAGE_CONTENT
-        | GatewayIntents::DIRECT_MESSAGES;
-
-    let config = Config::new();
-    let mut client = Client::builder(config.discord_bot_token, intents)
-        .event_handler(Handler)
-        .await
-        .expect("클라이언트 생성에 실패했습니다.");
-
-    if let Err(why) = client.start().await {
-        println!("클라이언트 오류가 발생했습니다: {why}");
-    }
-}
-
-
 /*
 ComponentInteraction {
     id: InteractionId(
-        1268605177120686081,
+        1268753631818158151,
     ),
     application_id: ApplicationId(
         1268146621896720464,
     ),
     data: ComponentInteractionData {
-        custom_id: "Web",
+        custom_id: "iOS",
         kind: Button,
     },
     guild_id: Some(
@@ -266,11 +212,11 @@ ComponentInteraction {
         ),
         member: None,
     },
-    token: "aW50ZXJhY3Rpb246MTI2ODYwNTE3NzEyMDY4NjA4MTpHOU9NZEI4UTBRdDBGZFIwWUR2S1IzempSWklmNHZVTDdyMnhobTRlZmprUXVRcHRvYjZzazdiYXNUR3RWWlhvUVVvclJYWGk0RWh3M0ZScGIyejQ4VXppVEVJNThZMVQyb01MNE13blZnTWRJbmJRckxvZXl5SG1UUGNwS3BiRw",
+    token: "aW50ZXJhY3Rpb246MTI2ODc1MzYzMTgxODE1ODE1MTp5QkRqdlZvZWZFTHFzSXp3Y3JQcUpZTVdmT3JCTGlGQ0s2NjVseFNnNUN2cW1pRGVad0RuTFZ2cllncE51Uk9zTWFpb2I5dVhJRnpMcG1ZbEN1TnZ6RDI3NksxaHJCMHhXc0VzTVVodWhuMElFaWd5Q1RtaW9CcHdKSG9Jb2JTeQ",
     version: 1,
     message: Message {
         id: MessageId(
-            1268603263864012831,
+            1268742804918501459,
         ),
         channel_id: ChannelId(
             1243554058808197193,
@@ -308,7 +254,7 @@ ComponentInteraction {
         },
         content: "팀을 알려주세요!",
         timestamp: Timestamp(
-            2024-08-01T16:16:27.614Z,
+            2024-08-02T01:30:56.794Z,
         ),
         edited_timestamp: None,
         tts: false,
@@ -344,7 +290,7 @@ ComponentInteraction {
         interaction: Some(
             MessageInteraction {
                 id: InteractionId(
-                    1268603256922443888,
+                    1268742800758018139,
                 ),
                 kind: Command,
                 name: "할일추가",
@@ -466,6 +412,5 @@ ComponentInteraction {
     ),
     entitlements: [],
 }
-
 
  */
