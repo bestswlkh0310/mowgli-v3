@@ -44,7 +44,7 @@ impl CommandTrait for GetTodosCommand {
                 a.push_str(&b);
                 a
             })
-        }.ok_or_else(|| Error::Other("메세지 파싱 실패"))?;
+        }.unwrap_or("할 일이 없네요. 쉬세요! 🤩".to_string());
         let create_embed = CreateEmbed::new()
             .title(format!("{}팀 투두", team_name))
             .description(message)
