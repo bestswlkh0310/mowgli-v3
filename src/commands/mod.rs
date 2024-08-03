@@ -1,4 +1,4 @@
-use serenity::all::{CommandInteraction, CreateEmbed, CreateInteractionResponseMessage};
+use serenity::all::{CommandInteraction, CreateInteractionResponseMessage};
 use serenity::async_trait;
 use crate::global::discord::Discord;
 

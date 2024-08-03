@@ -11,7 +11,6 @@ use crate::entity::team::Team;
 use crate::entity::todo::{Todo, TodoContent};
 use crate::global::discord::Discord;
 use crate::util::colour::GREEN;
-use crate::util::create_interaction_response_extension::create_response;
 use crate::util::create_embed_extension::CreateEmbedExtension;
 
 pub struct CreateTodoComponent;
@@ -40,7 +39,10 @@ impl ComponentTrait for CreateTodoComponent {
         println!("{:?}", d);
         if d.iter().count() != 2 {
             let create_embed = CreateEmbed::error_create_embed("마감일을 제대로 입력해주세요. \nex. 3월 2일 -> 3/2".to_string());
-            let builder = create_response(create_embed);
+            let message = CreateInteractionResponseMessage::new()
+                .add_embed(create_embed)
+                .flags(InteractionResponseFlags::EPHEMERAL);
+            let builder = CreateInteractionResponse::Message(message);
             if let Err(why) = response.interaction.create_response(&discord.ctx.http, builder).await {
                 println!("{}.0 Err - {}", file!(), why);
             };

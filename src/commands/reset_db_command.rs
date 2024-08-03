@@ -9,7 +9,7 @@ pub struct ResetDBCommand;
 
 #[async_trait]
 impl CommandTrait for ResetDBCommand {
-    async fn run(discord: &Discord, command: &CommandInteraction) -> serenity::Result<Option<CreateInteractionResponseMessage>> {
+    async fn run(discord: &Discord, _command: &CommandInteraction) -> serenity::Result<Option<CreateInteractionResponseMessage>> {
         Database.init_entity(discord).await?;
         let create_embed = CreateEmbed::new()
             .title("DB가 초기화 됐습니다.")

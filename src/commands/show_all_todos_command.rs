@@ -6,7 +6,6 @@ use crate::database::todo_repo::TodoRepo;
 use crate::entity::todo::{Todo, VecTodoExtension};
 use crate::global::discord::Discord;
 use crate::util::colour::GREEN;
-use crate::util::create_interaction_response_extension::create_response;
 
 pub struct ShowAllTodosCommand;
 

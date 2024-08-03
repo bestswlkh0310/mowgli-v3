@@ -23,14 +23,10 @@ impl ResultCreateEmbed for Result<Option<CreateInteractionResponseMessage>> {
 }
 
 pub trait CreateEmbedExtension {
-    fn unknown() -> CreateEmbed;
     fn error_create_embed(description: String) -> CreateEmbed;
 }
 
 impl CreateEmbedExtension for CreateEmbed {
-    fn unknown() -> CreateEmbed {
-        Self::error_create_embed("알 수 없는 에러가 발생했습니다".to_string())
-    }
 
     fn error_create_embed(description: String) -> CreateEmbed {
         CreateEmbed::new()

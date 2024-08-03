@@ -29,7 +29,6 @@ use crate::component::not_found::NotFountComponent;
 use crate::config::config::Config;
 use crate::global::discord::Discord;
 use crate::util::create_embed_extension::{ResultCreateEmbed};
-use crate::util::create_interaction_response_extension::create_response;
 
 mod commands;
 mod database;

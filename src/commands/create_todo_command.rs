@@ -1,5 +1,5 @@
 use serenity::{async_trait, Result};
-use serenity::all::{ButtonStyle, CommandInteraction, CreateActionRow, CreateButton, CreateEmbed, CreateInteractionResponse, CreateInteractionResponseMessage, InteractionResponseFlags};
+use serenity::all::{ButtonStyle, CommandInteraction, CreateActionRow, CreateButton, CreateInteractionResponse, CreateInteractionResponseMessage, InteractionResponseFlags};
 
 use crate::commands::CommandTrait;
 use crate::database::team_repo::TeamRepo;

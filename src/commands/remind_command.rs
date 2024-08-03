@@ -9,7 +9,7 @@ pub struct RemindCommand;
 
 #[async_trait]
 impl CommandTrait for RemindCommand {
-    async fn run(discord: &Discord, command: &CommandInteraction) -> serenity::Result<Option<CreateInteractionResponseMessage>> {
+    async fn run(discord: &Discord, _command: &CommandInteraction) -> serenity::Result<Option<CreateInteractionResponseMessage>> {
         let meta_data_repo = MetaDataRepo::new(discord);
         let main_channel_id = meta_data_repo.get_main_channel().await?;
         let channels = discord.guild_id.channels(&discord.ctx.http).await?;
