@@ -2,7 +2,7 @@ use serenity::all::{CommandDataOptionValue, CommandInteraction, CreateEmbed, Cre
 use serenity::{async_trait, Error};
 use crate::commands::{CommandTrait, WOW_DESCRIPTION};
 use crate::database::database_repo::DatabaseRepo;
-use crate::global::discord::Discord;
+use crate::global::discord::{Discord, Guild};
 use crate::util::colour::GREEN;
 
 pub struct ForceImportDBCommand;
@@ -31,7 +31,7 @@ impl CommandTrait for ForceImportDBCommand {
             _ => Err(Error::Other("에러"))?
         };
 
-        let database_repo = DatabaseRepo::new(discord);
+        let database_repo = DatabaseRepo::new(Guild::from(discord));
         database_repo.force_import(json).await?;
 
         let create_embed = CreateEmbed::new()

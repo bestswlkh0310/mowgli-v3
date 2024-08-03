@@ -4,7 +4,7 @@ use crate::commands::CommandTrait;
 use crate::database::team_repo::TeamRepo;
 use crate::database::todo_repo::TodoRepo;
 use crate::entity::todo::{Todo, VecTodoExtension};
-use crate::global::discord::Discord;
+use crate::global::discord::{Discord, Guild};
 use crate::util::colour::GREEN;
 
 pub struct ShowAllTodosCommand;
@@ -12,8 +12,8 @@ pub struct ShowAllTodosCommand;
 #[async_trait]
 impl CommandTrait for ShowAllTodosCommand {
     async fn run(discord: &Discord, _command: &CommandInteraction) -> serenity::Result<Option<CreateInteractionResponseMessage>> {
-        let team_repo = TeamRepo::new(discord);
-        let todo_repo = TodoRepo::new(discord);
+        let team_repo = TeamRepo::new(Guild::from(discord));
+        let todo_repo = TodoRepo::new(Guild::from(discord));
 
         let teams = team_repo.get_teams().await?;
         let todos = todo_repo.get_todos().await?;

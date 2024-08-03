@@ -3,14 +3,14 @@ use serenity::all::{ButtonStyle, CommandInteraction, CreateActionRow, CreateButt
 
 use crate::commands::CommandTrait;
 use crate::database::team_repo::TeamRepo;
-use crate::global::discord::Discord;
+use crate::global::discord::{Discord, Guild};
 
 pub struct AskTeamCommand;
 
 #[async_trait]
 impl CommandTrait for AskTeamCommand {
     async fn run(discord: &Discord, command: &CommandInteraction) -> Result<Option<CreateInteractionResponseMessage>> {
-        let teams = TeamRepo::new(discord).get_teams().await?;
+        let teams = TeamRepo::new(Guild::from(discord)).get_teams().await?;
         let buttons = teams.iter()
             .map(|team| CreateButton::new(&team.name)
                 .label(&team.name)

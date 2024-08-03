@@ -2,7 +2,7 @@ use serenity::all::{CommandDataOptionValue, CommandInteraction, CreateEmbed, Cre
 use serenity::{async_trait, Error};
 use crate::commands::CommandTrait;
 use crate::database::meta_data_repo::MetaDataRepo;
-use crate::global::discord::Discord;
+use crate::global::discord::{Discord, Guild};
 use crate::util::colour::GREEN;
 
 pub struct SettingMainChannelCommand;
@@ -28,7 +28,7 @@ impl CommandTrait for SettingMainChannelCommand {
             _ => Err(Error::Other("에러"))?
         };
 
-        let meta_data_repo = MetaDataRepo::new(discord);
+        let meta_data_repo = MetaDataRepo::new(Guild::from(discord));
         meta_data_repo.edit_main_channel(channel_id.get()).await?;
 
         let create_embed = CreateEmbed::new()

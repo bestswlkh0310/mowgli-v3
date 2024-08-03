@@ -9,7 +9,7 @@ use crate::component::ComponentTrait;
 use crate::database::todo_repo::TodoRepo;
 use crate::entity::team::Team;
 use crate::entity::todo::{Todo, TodoContent};
-use crate::global::discord::Discord;
+use crate::global::discord::{Discord, Guild};
 use crate::util::colour::GREEN;
 use crate::util::create_embed_extension::CreateEmbedExtension;
 
@@ -32,7 +32,7 @@ impl ComponentTrait for CreateTodoComponent {
                     .min_length(3)
                     .max_length(5)
             );
-        let response = component.quick_modal(discord.ctx, modal).await?.ok_or_else(|| Error::Other("response is None"))?;
+        let response = component.quick_modal(&discord.ctx, modal).await?.ok_or_else(|| Error::Other("response is None"))?;
         let inputs = &response.inputs;
         let (content, deadline) = (&inputs[0], &inputs[1]);
         let d: Vec<&str> = deadline.split("/").collect();
@@ -54,7 +54,7 @@ impl ComponentTrait for CreateTodoComponent {
 
         println!("{}, {}", m, d);
 
-        let todo_repo = TodoRepo::new(discord);
+        let todo_repo = TodoRepo::new(Guild::from(discord));
         let todo = Todo {
             team: Team { name: team_name.clone() },
             todo: TodoContent {

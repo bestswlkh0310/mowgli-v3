@@ -8,6 +8,7 @@ dotenv = "0.15.0"
 rand = { version = "0.9.0-alpha.2", features = [] }
 chrono = "0.4.38"
 serde = { version = "1.0.204", features = ["derive"] }
+cron = "0.12.1"
 
 [dependencies.tokio]
 version = "1.39.2"

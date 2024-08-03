@@ -28,6 +28,7 @@ use crate::component::show_todos_component::ShowTodosComponent;
 use crate::component::not_found::NotFountComponent;
 use crate::config::config::Config;
 use crate::global::discord::Discord;
+use crate::schedule::schedule_task;
 use crate::util::create_embed_extension::{ResultCreateEmbed};
 
 mod commands;
@@ -37,6 +38,7 @@ mod entity;
 mod config;
 mod component;
 mod global;
+mod schedule;
 
 struct Handler;
 
@@ -64,7 +66,7 @@ impl Handler {
             Ok(v) => v,
             _ => return
         };
-        let discord = Discord::new(ctx, &guild_id);
+        let discord = Discord::new(ctx.clone(), guild_id);
 
         // handle command
         let data = &command.data;
@@ -115,7 +117,7 @@ impl Handler {
             Ok(v) => v,
             _ => return
         };
-        let discord = Discord::new(ctx, &guild_id);
+        let discord = Discord::new(ctx.clone(), guild_id);
 
         // handle message interaction
         let interaction_name = message_interaction.name.as_str();
@@ -221,6 +223,11 @@ async fn main() {
         .event_handler(Handler)
         .await
         .expect("클라이언트 생성에 실패했습니다.");
+
+    let http = client.http.clone();
+    tokio::spawn(async move {
+        schedule_task(&http).await;
+    });
 
     if let Err(why) = client.start().await {
         println!("클라이언트 오류가 발생했습니다: {why}");

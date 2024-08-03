@@ -1,19 +1,19 @@
 use crate::entity::todo::Todo;
 use serenity::Result;
 use crate::database::database::{Database, DatabaseTrait};
-use crate::global::discord::Discord;
+use crate::global::discord::{Guild};
 
-pub struct TodoRepo<'a> {
-    pub discord: &'a Discord<'a>,
+pub struct TodoRepo {
+    pub guild: Guild
 }
 
-impl<'a> TodoRepo<'a> {
-    pub fn new(discord: &'a Discord) -> Self {
-        TodoRepo { discord }
+impl TodoRepo {
+    pub fn new(guild: Guild) -> Self {
+        TodoRepo { guild }
     }
 
     pub async fn get_todos(&self) -> Result<Vec<Todo>> {
-        let entity = Database.get_entity(self.discord).await?;
+        let entity = Database.get_entity(&self.guild).await?;
         let todos = entity.todos.iter().cloned().collect();
         Ok(todos)
     }
@@ -25,16 +25,16 @@ impl<'a> TodoRepo<'a> {
     }
 
     pub async fn create_todo(&self, todo: &Todo) -> Result<()> {
-        let mut entity = Database.get_entity(self.discord).await?;
+        let mut entity = Database.get_entity(&self.guild).await?;
         entity.todos.push(todo.clone());
-        Database.edit_entity(self.discord, &entity).await?;
+        Database.edit_entity(&self.guild, &entity).await?;
         Ok(())
     }
 
     pub async fn reset_todo(&self) -> Result<()> {
-        let mut entity = Database.get_entity(self.discord).await?;
+        let mut entity = Database.get_entity(&self.guild).await?;
         entity.todos = vec![];
-        Database.edit_entity(self.discord, &entity).await?;
+        Database.edit_entity(&self.guild, &entity).await?;
         Ok(())
     }
 }
