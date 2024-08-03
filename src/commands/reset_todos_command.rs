@@ -1,4 +1,4 @@
-use serenity::all::{CommandInteraction, CreateEmbed, CreateInteractionResponseMessage};
+use serenity::all::{CommandInteraction, CreateEmbed, CreateInteractionResponseMessage, InteractionResponseFlags};
 use serenity::{async_trait};
 use crate::commands::{CommandTrait, WOW_DESCRIPTION};
 use serenity::Result;
@@ -18,6 +18,7 @@ impl CommandTrait for ResetTodosCommand {
             .description(WOW_DESCRIPTION);
 
         Ok(Some(CreateInteractionResponseMessage::new()
+            .flags(InteractionResponseFlags::EPHEMERAL)
             .add_embed(create_embed)))
     }
 }

@@ -1,4 +1,4 @@
-use serenity::all::{CommandInteraction, CreateEmbed, CreateInteractionResponseMessage};
+use serenity::all::{CommandInteraction, CreateEmbed, CreateInteractionResponseMessage, InteractionResponseFlags};
 use serenity::async_trait;
 use crate::commands::{CommandTrait, WOW_DESCRIPTION};
 use crate::database::database::{Database, DatabaseTrait};
@@ -16,6 +16,7 @@ impl CommandTrait for ResetDBCommand {
             .description(WOW_DESCRIPTION)
             .color(GREEN);
         Ok(Some(CreateInteractionResponseMessage::new()
+            .flags(InteractionResponseFlags::EPHEMERAL)
             .add_embed(create_embed)))
     }
 }

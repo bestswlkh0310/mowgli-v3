@@ -1,4 +1,4 @@
-use serenity::all::{CommandInteraction, CreateEmbed, CreateInteractionResponseMessage};
+use serenity::all::{CommandInteraction, CreateEmbed, CreateInteractionResponseMessage, InteractionResponseFlags};
 use serenity::async_trait;
 use crate::commands::CommandTrait;
 use crate::global::discord::Discord;
@@ -14,6 +14,7 @@ impl CommandTrait for NotFoundCommand {
             .description("우와.. 어떻게 이 명령어를 입력했나요?")
             .color(RED);
         Ok(Some(CreateInteractionResponseMessage::new()
+            .flags(InteractionResponseFlags::EPHEMERAL)
             .add_embed(create_embed)))
     }
 }

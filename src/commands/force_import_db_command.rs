@@ -1,4 +1,4 @@
-use serenity::all::{CommandDataOptionValue, CommandInteraction, CreateEmbed, CreateInteractionResponseMessage};
+use serenity::all::{CommandDataOptionValue, CommandInteraction, CreateEmbed, CreateInteractionResponseMessage, InteractionResponseFlags};
 use serenity::{async_trait, Error};
 use crate::commands::{CommandTrait, WOW_DESCRIPTION};
 use crate::database::database_repo::DatabaseRepo;
@@ -39,6 +39,7 @@ impl CommandTrait for ForceImportDBCommand {
             .description(WOW_DESCRIPTION)
             .color(GREEN);
         Ok(Some(CreateInteractionResponseMessage::new()
+            .flags(InteractionResponseFlags::EPHEMERAL)
             .add_embed(create_embed)))
     }
 }

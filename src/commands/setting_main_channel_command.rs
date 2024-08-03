@@ -1,4 +1,4 @@
-use serenity::all::{CommandDataOptionValue, CommandInteraction, CreateEmbed, CreateInteractionResponseMessage};
+use serenity::all::{CommandDataOptionValue, CommandInteraction, CreateEmbed, CreateInteractionResponseMessage, InteractionResponseFlags};
 use serenity::{async_trait, Error};
 use crate::commands::CommandTrait;
 use crate::database::meta_data_repo::MetaDataRepo;
@@ -36,6 +36,7 @@ impl CommandTrait for SettingMainChannelCommand {
             .color(GREEN);
 
         Ok(Some(CreateInteractionResponseMessage::new()
+            .flags(InteractionResponseFlags::EPHEMERAL)
             .add_embed(create_embed)))
     }
 }
