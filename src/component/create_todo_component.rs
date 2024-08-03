@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use chrono::NaiveDate;
 use serenity::{async_trait, Error};
-use serenity::all::{ComponentInteraction, CreateInputText, CreateInteractionResponseMessage, CreateQuickModal, InputTextStyle};
+use serenity::all::{ComponentInteraction, CreateInputText, CreateInteractionResponse, CreateInteractionResponseMessage, CreateQuickModal, InputTextStyle, InteractionResponseFlags};
 use serenity::builder::CreateEmbed;
 
 use crate::component::ComponentTrait;
@@ -10,6 +10,7 @@ use crate::database::todo_repo::TodoRepo;
 use crate::entity::team::Team;
 use crate::entity::todo::{Todo, TodoContent};
 use crate::global::discord::Discord;
+use crate::util::colour::GREEN;
 use crate::util::create_interaction_response_extension::create_response;
 use crate::util::create_embed_extension::CreateEmbedExtension;
 
@@ -63,9 +64,15 @@ impl ComponentTrait for CreateTodoComponent {
 
         let create_embed = CreateEmbed::new()
             .title("투두추가 성공")
-            .description(format!("{}까지 {} 화이팅!", deadline, content));
+            .color(GREEN)
+            .description(format!("{}까지 {}", deadline, content));
 
-        let builder = create_response(create_embed);
+        let message = CreateInteractionResponseMessage::new()
+            .flags(InteractionResponseFlags::EPHEMERAL)
+            .add_embed(create_embed.clone());
+
+        let builder = CreateInteractionResponse::Message(message);
+
         if let Err(why) = response.interaction.create_response(&discord.ctx.http, builder).await {
             println!("{} Err.1 - {}", file!(), why);
         };

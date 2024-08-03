@@ -1,5 +1,5 @@
 use serenity::{async_trait, Result};
-use serenity::all::{ButtonStyle, CommandInteraction, CreateActionRow, CreateButton, CreateEmbed, CreateInteractionResponse, CreateInteractionResponseMessage};
+use serenity::all::{ButtonStyle, CommandInteraction, CreateActionRow, CreateButton, CreateEmbed, CreateInteractionResponse, CreateInteractionResponseMessage, InteractionResponseFlags};
 
 use crate::commands::CommandTrait;
 use crate::database::team_repo::TeamRepo;
@@ -22,7 +22,8 @@ impl CommandTrait for AskTeamCommand {
             .content(
                 "팀을 알려주세요!"
             )
-            .components(vec![team_selector]);
+            .components(vec![team_selector])
+            .flags(InteractionResponseFlags::EPHEMERAL);
         let builder = CreateInteractionResponse::Message(message);
         if let Err(why) = command.create_response(&discord.ctx.http, builder).await {
             println!("응답할 수 없습니다: {why}");
