@@ -2,7 +2,7 @@ use serenity::all::{Context, GuildId};
 
 pub struct Discord<'a> {
     pub ctx: &'a Context,
-    pub guild_id: &'a GuildId,
+    pub guild_id: &'a GuildId
 }
 
 impl<'a> Discord<'a> {

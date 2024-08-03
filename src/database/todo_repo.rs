@@ -30,4 +30,11 @@ impl<'a> TodoRepo<'a> {
         Database.edit_entity(self.discord, &entity).await?;
         Ok(())
     }
+
+    pub async fn reset_todo(&self) -> Result<()> {
+        let mut entity = Database.get_entity(self.discord).await?;
+        entity.todos = vec![];
+        Database.edit_entity(self.discord, &entity).await?;
+        Ok(())
+    }
 }

@@ -14,9 +14,12 @@ use serenity::{
 use serenity::all::{CommandInteraction, CommandOptionType, ComponentInteraction, CreateCommand, CreateCommandOption};
 use crate::commands::CommandTrait;
 use crate::commands::create_todo_command::AskTeamCommand;
-
+use crate::commands::force_import_db_command::ForceImportDBCommand;
 use crate::commands::not_found_command::NotFoundCommand;
+use crate::commands::remind_command::RemindCommand;
+use crate::commands::reset_db_command::ResetDBCommand;
 use crate::commands::reset_todos_command::ResetTodosCommand;
+use crate::commands::setting_main_channel_command::SettingMainChannelCommand;
 use crate::commands::show_all_todos_command::ShowAllTodosCommand;
 use crate::component::ComponentTrait;
 use crate::component::create_todo_component::CreateTodoComponent;
@@ -24,7 +27,7 @@ use crate::component::show_todos_component::ShowTodosComponent;
 use crate::component::not_found::NotFountComponent;
 use crate::config::config::Config;
 use crate::global::discord::Discord;
-use crate::util::create_embed_extension::{ResultCreateEmbed, CreateEmbedExtension};
+use crate::util::create_embed_extension::{ResultCreateEmbed};
 use crate::util::create_interaction_response_extension::create_response;
 
 mod commands;
@@ -65,14 +68,26 @@ impl Handler {
 
         // handle command
         let data = &command.data;
-        let result = match data.name.as_str() {
-            "todo" => match data.options.first().unwrap().name.as_str() {
+        let name = data.name.as_str();
+        let option = data.options.first().unwrap().name.as_str();
+        let result = match name {
+            "todo" => match option {
                 "show" => AskTeamCommand::run(&discord, command).await,
                 "show-all" => ShowAllTodosCommand::run(&discord, command).await,
                 "reset" => ResetTodosCommand::run(&discord, command).await,
                 "add" => AskTeamCommand::run(&discord, command).await,
+                "remind" => RemindCommand::run(&discord, command).await,
                 _ => NotFoundCommand::run(&discord, command).await
             },
+            "setting" => match option {
+                "main-channel" => SettingMainChannelCommand::run(&discord, command).await,
+                _ => NotFoundCommand::run(&discord, command).await
+            },
+            "db" => match option {
+                "reset" => ResetDBCommand::run(&discord, command).await,
+                "force-import" => ForceImportDBCommand::run(&discord, command).await,
+                _ => NotFoundCommand::run(&discord, command).await
+            }
             _ => NotFoundCommand::run(&discord, command).await
         };
 
@@ -156,6 +171,30 @@ impl EventHandler for Handler {
                 )
                 .add_option(
                     CreateCommandOption::new(CommandOptionType::SubCommand, "show-all", "전체 투두 확인")
+                )
+                .add_option(
+                    CreateCommandOption::new(CommandOptionType::SubCommand, "remind", "리마인드")
+                ),
+            CreateCommand::new("setting")
+                .description("설정~")
+                .add_option(
+                    CreateCommandOption::new(CommandOptionType::SubCommand, "main-channel", "메인 채널 설정")
+                        .add_sub_option(
+                            CreateCommandOption::new(CommandOptionType::Channel, "channel", "메인 채널")
+                                .required(true)
+                        )
+                ),
+            CreateCommand::new("db")
+                .description("데이터베이스 설정")
+                .add_option(
+                    CreateCommandOption::new(CommandOptionType::SubCommand, "reset", "DB 전체 초기화")
+                )
+                .add_option(
+                    CreateCommandOption::new(CommandOptionType::SubCommand, "force-import", "DB 강제 불러오기")
+                        .add_sub_option(
+                            CreateCommandOption::new(CommandOptionType::String, "json", "json raw value")
+                                .required(true)
+                        )
                 )
         ])
             .await

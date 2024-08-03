@@ -32,12 +32,7 @@ impl ComponentTrait for CreateTodoComponent {
                     .min_length(3)
                     .max_length(5)
             );
-
-        let response = match component.quick_modal(discord.ctx, modal).await {
-            Ok(Some(res)) => res,
-            Err(why) => return Err(why),
-            _ => return Err(Error::Other("response is None"))
-        };
+        let response = component.quick_modal(discord.ctx, modal).await?.ok_or_else(|| Error::Other("response is None"))?;
         let inputs = &response.inputs;
         let (content, deadline) = (&inputs[0], &inputs[1]);
         let d: Vec<&str> = deadline.split("/").collect();
