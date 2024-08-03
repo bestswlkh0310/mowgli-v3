@@ -1,4 +1,4 @@
-use serenity::all::{ComponentInteraction, CreateEmbed};
+use serenity::all::{ComponentInteraction, CreateInteractionResponseMessage};
 use serenity::async_trait;
 use serenity::Result;
 use crate::global::discord::Discord;
@@ -9,5 +9,5 @@ pub mod show_todos_component;
 
 #[async_trait]
 pub trait ComponentTrait {
-    async fn run(discord: &Discord, component: &ComponentInteraction) -> Result<Option<CreateEmbed>>;
+    async fn run(discord: &Discord, component: &ComponentInteraction) -> Result<Option<CreateInteractionResponseMessage>>;
 }

@@ -9,7 +9,7 @@ pub struct AskTeamCommand;
 
 #[async_trait]
 impl CommandTrait for AskTeamCommand {
-    async fn run(discord: &Discord, command: &CommandInteraction) -> Result<Option<CreateEmbed>> {
+    async fn run(discord: &Discord, command: &CommandInteraction) -> Result<Option<CreateInteractionResponseMessage>> {
         let teams = TeamRepo::new(discord).get_teams().await?;
         let buttons = teams.iter()
             .map(|team| CreateButton::new(&team.name)

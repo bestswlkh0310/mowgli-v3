@@ -1,4 +1,4 @@
-use serenity::all::{CommandInteraction, CreateEmbed};
+use serenity::all::{CommandInteraction, CreateEmbed, CreateInteractionResponseMessage};
 use serenity::async_trait;
 use crate::global::discord::Discord;
 
@@ -14,7 +14,7 @@ pub mod force_import_db_command;
 
 #[async_trait]
 pub trait CommandTrait {
-    async fn run(discord: &Discord, command: &CommandInteraction) -> serenity::Result<Option<CreateEmbed>>;
+    async fn run(discord: &Discord, command: &CommandInteraction) -> serenity::Result<Option<CreateInteractionResponseMessage>>;
 }
 
 const WOW_DESCRIPTION: &str = "짜잔";

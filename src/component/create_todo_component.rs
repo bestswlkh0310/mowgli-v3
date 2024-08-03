@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use chrono::NaiveDate;
 use serenity::{async_trait, Error};
-use serenity::all::{ComponentInteraction, CreateInputText, CreateQuickModal, InputTextStyle};
+use serenity::all::{ComponentInteraction, CreateInputText, CreateInteractionResponseMessage, CreateQuickModal, InputTextStyle};
 use serenity::builder::CreateEmbed;
 
 use crate::component::ComponentTrait;
@@ -17,7 +17,7 @@ pub struct CreateTodoComponent;
 
 #[async_trait]
 impl ComponentTrait for CreateTodoComponent {
-    async fn run(discord: &Discord, component: &ComponentInteraction) -> serenity::Result<Option<CreateEmbed>> {
+    async fn run(discord: &Discord, component: &ComponentInteraction) -> serenity::Result<Option<CreateInteractionResponseMessage>> {
         let team_name = &component.data.custom_id;
         let modal = CreateQuickModal::new("todo 추가")
             .field(
@@ -38,7 +38,7 @@ impl ComponentTrait for CreateTodoComponent {
         let d: Vec<&str> = deadline.split("/").collect();
         println!("{:?}", d);
         if d.iter().count() != 2 {
-            let create_embed = CreateEmbed::make_create_embed("마감일을 제대로 입력해주세요. \nex. 3월 2일 -> 3/2".to_string());
+            let create_embed = CreateEmbed::error_create_embed("마감일을 제대로 입력해주세요. \nex. 3월 2일 -> 3/2".to_string());
             let builder = create_response(create_embed);
             if let Err(why) = response.interaction.create_response(&discord.ctx.http, builder).await {
                 println!("{}.0 Err - {}", file!(), why);

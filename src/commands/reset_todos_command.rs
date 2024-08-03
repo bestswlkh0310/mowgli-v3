@@ -1,4 +1,4 @@
-use serenity::all::{CommandInteraction, CreateEmbed};
+use serenity::all::{CommandInteraction, CreateEmbed, CreateInteractionResponseMessage};
 use serenity::{async_trait};
 use crate::commands::{CommandTrait, WOW_DESCRIPTION};
 use serenity::Result;
@@ -9,7 +9,7 @@ pub struct ResetTodosCommand;
 
 #[async_trait]
 impl CommandTrait for ResetTodosCommand {
-    async fn run(discord: &Discord, _command: &CommandInteraction) -> Result<Option<CreateEmbed>> {
+    async fn run(discord: &Discord, _command: &CommandInteraction) -> Result<Option<CreateInteractionResponseMessage>> {
         let todo_repo = TodoRepo::new(discord);
         todo_repo.reset_todo().await?;
 
@@ -17,6 +17,7 @@ impl CommandTrait for ResetTodosCommand {
             .title("투두 초기화 성공")
             .description(WOW_DESCRIPTION);
 
-        Ok(Some(create_embed))
+        Ok(Some(CreateInteractionResponseMessage::new()
+            .add_embed(create_embed)))
     }
 }

@@ -12,6 +12,7 @@ use serenity::{
     utils::MessageBuilder,
 };
 use serenity::all::{CommandInteraction, CommandOptionType, ComponentInteraction, CreateCommand, CreateCommandOption};
+use serenity::builder::CreateInteractionResponse;
 use crate::commands::CommandTrait;
 use crate::commands::create_todo_command::AskTeamCommand;
 use crate::commands::force_import_db_command::ForceImportDBCommand;
@@ -92,8 +93,8 @@ impl Handler {
         };
 
         // handle result
-        if let Some(create_embed) = result.create_embed() {
-            let builder = create_response(create_embed);
+        if let Some(message) = result.create_embed() {
+            let builder = CreateInteractionResponse::Message(message);
             if let Err(why) = command.create_response(&ctx.http, builder).await {
                 println!("API resposne 에러 발생 - {}", why);
             };
@@ -126,8 +127,8 @@ impl Handler {
         };
 
         // handle result
-        if let Some(create_embed) = result.create_embed() {
-            let builder = create_response(create_embed);
+        if let Some(message) = result.create_embed() {
+            let builder = CreateInteractionResponse::Message(message);
             if let Err(why) = component.create_response(&ctx.http, builder).await {
                 println!("API resposne 에러 발생 - {}", why);
             };

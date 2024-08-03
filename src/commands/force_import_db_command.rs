@@ -1,4 +1,4 @@
-use serenity::all::{CommandDataOptionValue, CommandInteraction, CreateEmbed};
+use serenity::all::{CommandDataOptionValue, CommandInteraction, CreateEmbed, CreateInteractionResponseMessage};
 use serenity::{async_trait, Error};
 use crate::commands::{CommandTrait, WOW_DESCRIPTION};
 use crate::database::database_repo::DatabaseRepo;
@@ -9,7 +9,7 @@ pub struct ForceImportDBCommand;
 
 #[async_trait]
 impl CommandTrait for ForceImportDBCommand {
-    async fn run(discord: &Discord, command: &CommandInteraction) -> serenity::Result<Option<CreateEmbed>> {
+    async fn run(discord: &Discord, command: &CommandInteraction) -> serenity::Result<Option<CreateInteractionResponseMessage>> {
         let option = command.data.options.first().ok_or_else(|| Error::Other("에러"))?;
         println!("{:?}", option);
 
@@ -38,6 +38,7 @@ impl CommandTrait for ForceImportDBCommand {
             .title("DB 강제 불러오기 성공! 🙄")
             .description(WOW_DESCRIPTION)
             .color(GREEN);
-        Ok(Some(create_embed))
+        Ok(Some(CreateInteractionResponseMessage::new()
+            .add_embed(create_embed)))
     }
 }

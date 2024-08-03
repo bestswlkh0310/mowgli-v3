@@ -1,4 +1,4 @@
-use serenity::all::{CommandDataOptionValue, CommandInteraction, CreateEmbed};
+use serenity::all::{CommandDataOptionValue, CommandInteraction, CreateEmbed, CreateInteractionResponseMessage};
 use serenity::{async_trait, Error};
 use crate::commands::CommandTrait;
 use crate::database::meta_data_repo::MetaDataRepo;
@@ -9,7 +9,7 @@ pub struct SettingMainChannelCommand;
 
 #[async_trait]
 impl CommandTrait for SettingMainChannelCommand {
-    async fn run(discord: &Discord, command: &CommandInteraction) -> serenity::Result<Option<CreateEmbed>> {
+    async fn run(discord: &Discord, command: &CommandInteraction) -> serenity::Result<Option<CreateInteractionResponseMessage>> {
         let option = command.data.options.first().ok_or_else(|| Error::Other("invalid option"))?;
         if option.name != "main-channel" {
             Err(Error::Other("에러"))?
@@ -35,6 +35,7 @@ impl CommandTrait for SettingMainChannelCommand {
             .description("### 메인 채널 등록 성공! 😍")
             .color(GREEN);
 
-        Ok(Some(create_embed))
+        Ok(Some(CreateInteractionResponseMessage::new()
+            .add_embed(create_embed)))
     }
 }

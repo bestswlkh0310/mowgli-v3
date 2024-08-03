@@ -1,4 +1,4 @@
-use serenity::all::{ComponentInteraction, CreateEmbed};
+use serenity::all::{ComponentInteraction, CreateEmbed, CreateInteractionResponseMessage};
 use serenity::async_trait;
 
 use crate::component::ComponentTrait;
@@ -11,7 +11,7 @@ pub struct ShowTodosComponent;
 
 #[async_trait]
 impl ComponentTrait for ShowTodosComponent {
-    async fn run(discord: &Discord, component: &ComponentInteraction) -> serenity::Result<Option<CreateEmbed>> {
+    async fn run(discord: &Discord, component: &ComponentInteraction) -> serenity::Result<Option<CreateInteractionResponseMessage>> {
         let team_name = &component.data.custom_id;
 
         let todo_repo = TodoRepo::new(discord);
@@ -22,6 +22,7 @@ impl ComponentTrait for ShowTodosComponent {
             .description(message)
             .color(GREEN);
 
-        Ok(Some(create_embed))
+        Ok(Some(CreateInteractionResponseMessage::new()
+            .add_embed(create_embed)))
     }
 }
