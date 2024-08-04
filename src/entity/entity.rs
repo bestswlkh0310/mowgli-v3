@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use crate::entity::metadata::MetaData;
+use crate::entity::schedule::Schedule;
 use crate::entity::team::Team;
 use crate::entity::todo::Todo;
 
@@ -7,7 +8,8 @@ use crate::entity::todo::Todo;
 pub struct Entity {
     pub teams: Vec<Team>,
     pub todos: Vec<Todo>,
-    pub meta_data: MetaData
+    pub meta_data: MetaData,
+    pub schedules: Vec<Schedule>
 }
 
 impl Entity {
@@ -30,7 +32,8 @@ impl Entity {
             todos: vec![],
             meta_data: MetaData {
                 main_channel_id: None
-            }
+            },
+            schedules: vec![]
         }
     }
 }

@@ -11,6 +11,8 @@ pub mod remind_command;
 pub mod setting_main_channel_command;
 pub mod reset_db_command;
 pub mod force_import_db_command;
+pub mod create_schedule_command;
+pub mod get_schedule_command;
 
 #[async_trait]
 pub trait CommandTrait {

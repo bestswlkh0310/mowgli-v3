@@ -82,13 +82,17 @@ impl Handler {
                 "remind" => RemindCommand::run(&discord, command).await,
                 _ => NotFoundCommand::run(&discord, command).await
             },
-            "setting" => match option {
+            "설정" => match option {
                 "main-channel" => SettingMainChannelCommand::run(&discord, command).await,
                 _ => NotFoundCommand::run(&discord, command).await
             },
             "db" => match option {
                 "reset" => ResetDBCommand::run(&discord, command).await,
                 "force-import" => ForceImportDBCommand::run(&discord, command).await,
+                _ => NotFoundCommand::run(&discord, command).await
+            },
+            "일정" => match option {
+                "add" => NotFoundCommand::run(&discord, command).await,
                 _ => NotFoundCommand::run(&discord, command).await
             }
             _ => NotFoundCommand::run(&discord, command).await
@@ -123,8 +127,8 @@ impl Handler {
         // handle message interaction
         let interaction_name = message_interaction.name.as_str();
         let result = match interaction_name {
-            "todo add" => CreateTodoComponent::run(&discord, component).await,
-            "todo show" => ShowTodosComponent::run(&discord, component).await,
+            "TODO add" => CreateTodoComponent::run(&discord, component).await,
+            "TODO show" => ShowTodosComponent::run(&discord, component).await,
             _ => NotFountComponent::run(&discord, component).await
         };
 
@@ -178,7 +182,7 @@ impl EventHandler for Handler {
                 .add_option(
                     CreateCommandOption::new(CommandOptionType::SubCommand, "remind", "리마인드")
                 ),
-            CreateCommand::new("setting")
+            CreateCommand::new("설정")
                 .description("설정~")
                 .add_option(
                     CreateCommandOption::new(CommandOptionType::SubCommand, "main-channel", "메인 채널 설정")
@@ -198,6 +202,11 @@ impl EventHandler for Handler {
                             CreateCommandOption::new(CommandOptionType::String, "json", "json raw value")
                                 .required(true)
                         )
+                ),
+            CreateCommand::new("일정")
+                .description("일정 관리")
+                .add_option(
+                    CreateCommandOption::new(CommandOptionType::SubCommand, "add", "일정 추가")
                 ),
         ])
             .await
