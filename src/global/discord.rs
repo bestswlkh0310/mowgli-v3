@@ -12,6 +12,7 @@ impl Discord {
     }
 }
 
+#[derive(Clone)]
 pub struct Guild {
     pub http: Arc<Http>,
     pub guild_id: GuildId,

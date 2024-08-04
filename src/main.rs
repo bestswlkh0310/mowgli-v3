@@ -13,6 +13,7 @@ use serenity::{
 };
 use serenity::all::{CommandInteraction, CommandOptionType, ComponentInteraction, CreateCommand, CreateCommandOption};
 use serenity::builder::CreateInteractionResponse;
+use tokio_cron_scheduler::{JobScheduler, JobSchedulerError};
 use crate::commands::CommandTrait;
 use crate::commands::create_todo_command::AskTeamCommand;
 use crate::commands::force_import_db_command::ForceImportDBCommand;
@@ -197,7 +198,7 @@ impl EventHandler for Handler {
                             CreateCommandOption::new(CommandOptionType::String, "json", "json raw value")
                                 .required(true)
                         )
-                )
+                ),
         ])
             .await
             .expect("명령 생성에 실패했습니다.");
@@ -213,7 +214,7 @@ impl EventHandler for Handler {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), JobSchedulerError> {
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT
         | GatewayIntents::DIRECT_MESSAGES;
@@ -225,11 +226,27 @@ async fn main() {
         .expect("클라이언트 생성에 실패했습니다.");
 
     let http = client.http.clone();
-    tokio::spawn(async move {
-        schedule_task(&http).await;
-    });
+    let mut sched = JobScheduler::new().await?;
+
+    match schedule_task(http).await {
+        Ok(job) => {
+            sched.add(job).await?;
+            println!("스케쥴링 Ok");
+        }
+        Err(why) => {
+            println!("스케쥴링 Err {}", why);
+            return Ok(())
+        }
+    };
+
+    match sched.start().await {
+        Err(why) => println!("스케쥴링 Start Err{}", why),
+        _ => println!("스케쥴링 Start Ok")
+    }
 
     if let Err(why) = client.start().await {
         println!("클라이언트 오류가 발생했습니다: {why}");
     }
+
+    Ok(())
 }
